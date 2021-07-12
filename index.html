@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>遠隔支援 P2P サイト</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script type="text/javascript" async="" src="http://www.google-analytics.com/ga.js"></script>
+
+    <script type="text/javascript" src="cp_depends.js"></script>
+    <script src="CanvasWidget.js" type="text/javascript"></script>
+    <script src="CanvasPainter.js" type="text/javascript"></script>
+    <script src="CPWidgets.js" type="text/javascript"></script>
+    <script src="CPAnimator.js" type="text/javascript"></script>
+    <script src="CPDrawing.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+      var canvasPainter;
+      var saveDrawing;
+      var canvasAnimator;
+      var colorWidget;
+      var lineWidthWidget;
+      var transportWidget;
+    
+      function doOnLoad() {
+        if(CanvasHelper.canvasExists("canvas")) {
+          canvasPainter = new CanvasPainter("canvas", "canvasInterface", {x: 90, y: 10});
+          //init save objects
+          //saveDrawing = new CPDrawing(canvasPainter);
+          canvasAnimator = new CPAnimator(canvasPainter);
+    
+          //init widgets
+          colorWidget = new ColorWidget('colorChooser', {x: 500, y: 10});
+          colorWidget.addWidgetListener(function() {
+            canvasPainter.setColor(colorWidget.colorString);
+          });
+    
+          lineWidthWidget = new LineWidthWidget('lineWidthChooser', 10, {x: 500, y: 120});
+          canvasPainter.setLineWidth(10);
+          lineWidthWidget.addWidgetListener(function() {
+            canvasPainter.setLineWidth(lineWidthWidget.lineWidth);
+          });
+    
+          transportWidget = new TransportWidget('transportWidget', {x: 500, y: 190}, canvasAnimator);
+        } else {
+          var ffb = new Image();
+          ffb.src = "http://www.mozilla.org/products/firefox/buttons/getfirefox_large2.png";
+          document.getElementById("controls").style.display = "none";
+          document.getElementById("noCanvas").style.display = "block";
+          document.getElementById("ffbutton").src = ffb.src;
+          document.getElementById("cpainterInfo").style.display = "none";
+        }
+      }
+    
+      function printError(error) {
+        document.getElementById("errorArea").innerHTML += error +"<br>";
+      }
+    
+        // used by the dhtml buttons
+      function setControlLook(id, color) {
+        if(id != canvasPainter.curDrawAction)
+        document.getElementById("btn_"+id).style.background = color;
+      }
+    
+      function setCPDrawAction(action) {
+        document.getElementById("btn_"+canvasPainter.curDrawAction).style.background = "#FFFFFF";
+        document.getElementById("btn_"+action).style.background = "#CCCCCC";
+        canvasPainter.setDrawAction(action);
+      }
+    </script>
+    <script type="text/javascript">
+    
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-4001349-10']);
+      _gaq.push(['_trackPageview']);
+    
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    
+    </script>
+
+  </head>
+
+  <body onload="doOnLoad()">
+
+    <div class="container">
+
+      <div class="p2p-media">
+        
+        <div class="box1">
+          <div class="remote-stream">
+            <video id="js-remote-stream"></video>
+          </div>
+        </div>
+
+        <div class="box2">
+          <div class="local-stream">
+            <video id="js-local-stream"></video>
+            <p class="p">Your ID: <span id="js-local-id"></span></p>
+            <input type="text" placeholder="Remote Peer ID" id="js-remote-id">
+            <button id="js-call-trigger">Call</button>
+            <button id="js-close-trigger">Close</button><br>
+            <button id="devices_button" onclick="getDeviceList()">Get Devices</button>
+            <select id=camera_list size="1" style="width: 180px;"></select>
+        
+
+          </div>
+          
+        </div>
+      </div>
+    </div>
+
+    
+    <canvas id="canvas" width="510" height="600"></canvas>
+    <canvas id="canvasInterface" width="510" height="600"></canvas>
+
+    <div id="controls">
+      <div class="ctr_btn" id="btn_0" style="background: #CCCCCC;" onclick="setCPDrawAction(0)" onMouseDown="setControlLook(0, '#CCCCCC')" onMouseOver="setControlLook(0, '#EEEEEE')" onMouseOut="setControlLook(0, '#FFFFFF')">brush</div>
+      <div class="ctr_btn" id="btn_1" onclick="setCPDrawAction(1)" onMouseDown="setControlLook(1, '#CCCCCC')" onMouseOver="setControlLook(1, '#EEEEEE')" onMouseOut="setControlLook(1, '#FFFFFF')">brush 2</div>
+      <div class="ctr_btn" id="btn_2" onclick="setCPDrawAction(2)" onMouseDown="setControlLook(2, '#CCCCCC')" onMouseOver="setControlLook(2, '#EEEEEE')" onMouseOut="setControlLook(2, '#FFFFFF')">line</div>
+      <div class="ctr_btn" id="btn_3" onclick="setCPDrawAction(3)" onMouseDown="setControlLook(3, '#CCCCCC')" onMouseOver="setControlLook(3, '#EEEEEE')" onMouseOut="setControlLook(3, '#FFFFFF')">rectangle</div>
+      <div class="ctr_btn" id="btn_4" onclick="setCPDrawAction(4)" onMouseDown="setControlLook(4, '#CCCCCC')" onMouseOver="setControlLook(4, '#EEEEEE')" onMouseOut="setControlLook(4, '#FFFFFF')">circle</div>
+      <div class="ctr_btn" id="btn_5" onclick="setCPDrawAction(5)" onMouseDown="setControlLook(5, '#CCCCCC')" onMouseOver="setControlLook(5, '#EEEEEE')" onMouseOut="setControlLook(5, '#FFFFFF')">clear</div>
+   </div>
+    
+    <div id="errorArea"></div>
+    
+    <div id="noCanvas" style="display:none;">
+      <center>This software requires <a href="http://www.mozilla.com/firefox/">Mozilla Firefox 1.5</a> or Opera 8.5</center><br/><br/>
+      <center><a href="http://www.getfirefox.net/" title="Get Firefox - Web browsing redefined."><img id="ffbutton" src="" width="178" height="60" border="0" alt="Get Firefox"></a> </center>
+    
+
+    <script src="https://cdn.webrtc.ecl.ntt.com/skyway-4.4.1.js"></script>
+    <script src="key.js"></script>
+    <script src="script.js"></script>
+    <script>console.log('GitHub Pages Sample');</script>
+
+    <script>
+
+      var localVideo = document.getElementById('local_video');
+      var videoContainer = document.getElementById('container');
+      var micList = document.getElementById("mic_list");
+      var cameraList = document.getElementById("camera_list");
+      var speakerList = document.getElementById("speaker_list");
+     
+      var localStream = null;
+      
+      function stopVideo() {
+       localVideo.pause();
+       if (localVideo.srcObject) {
+         localVideo.srcObject = null;
+       }
+       else {
+         localVideo.src = "";
+       }
+     
+       if (localStream) {
+        stopStream(localStream);
+        localStream = null;
+       }
+      }
+     
+      function stopStream(stream) {
+       if (!stream) {
+        console.warn('NO stream');
+        return;
+       }
+         
+       var tracks = stream.getTracks();
+       if (! tracks) {
+        console.warn('NO tracks');
+        return;
+       }
+     
+       for (index in tracks) {
+        tracks[index].stop();
+       } 
+      }  
+     
+      function logStream(msg, stream) {
+       console.log(msg + ': id=' + stream.id);
+     
+       var videoTracks = stream.getVideoTracks();
+       if (videoTracks) {
+        console.log('videoTracks.length=' + videoTracks.length);
+        for (var i = 0; i < videoTracks.length; i++) {
+         var track = videoTracks[i];
+         console.log(' track.id=' + track.id);
+        }
+       }
+       
+       var audioTracks = stream.getAudioTracks();
+       if (audioTracks) {
+        console.log('audioTracks.length=' + audioTracks.length);
+        for (var i = 0; i < audioTracks.length; i++) {
+         var track = audioTracks[i];
+         console.log(' track.id=' + track.id);
+        }
+       }
+      }
+     
+     
+     //--------------------
+     
+      function clearDeviceList() {
+       while(micList.lastChild) {
+        micList.removeChild(micList.lastChild);
+       }
+       while(cameraList.lastChild) {
+        cameraList.removeChild(cameraList.lastChild);
+       }
+       while(speakerList.lastChild) {
+        speakerList.removeChild(speakerList.lastChild);
+       }
+      }
+     
+      function addDevice(device) {
+       if (device.kind === 'audioinput') {
+        var id = device.deviceId;
+        var label = device.label || 'microphone'; // label is available for https 
+        var option = document.createElement('option');
+        option.setAttribute('value', id);
+        option.innerHTML = label + '(' + id + ')';;
+        micList.appendChild(option);
+       }
+       else if (device.kind === 'videoinput') {
+        var id = device.deviceId;
+        var label = device.label || 'camera'; // label is available for https 
+     
+        var option = document.createElement('option');
+        option.setAttribute('value', id);
+        option.innerHTML = label + '(' + id + ')';
+        cameraList.appendChild(option);
+       }
+       else if (device.kind === 'audiooutput') {
+        var id = device.deviceId;
+        var label = device.label || 'speaker'; // label is available for https 
+     
+        var option = document.createElement('option');
+        option.setAttribute('value', id);
+        option.innerHTML = label + '(' + id + ')';
+        speakerList.appendChild(option);   
+       }
+       else {
+        console.error('UNKNOWN Device kind:' + device.kind);
+       }
+      }
+     
+      function getDeviceList() {
+       clearDeviceList();
+       navigator.mediaDevices.enumerateDevices()
+       .then(function(devices) {
+        devices.forEach(function(device) {
+         console.log(device.kind + ": " + device.label +
+                     " id = " + device.deviceId);
+         addDevice(device);
+        });
+       })
+       .catch(function(err) {
+        console.error('enumerateDevide ERROR:', err);
+       });
+      }
+     
+      function getSelectedVideo() {
+       var id = cameraList.options[cameraList.selectedIndex].value;
+       return id;
+      }
+     
+      function getSelectedAudio() {
+       var id = micList.options[micList.selectedIndex].value;
+       return id;
+      }
+     
+      function getSelectedSpeaker() {
+       var id = speakerList.options[speakerList.selectedIndex].value;
+       return id;
+      }
+     
+      function setSpeaker() {
+       var speakerId = getSelectedSpeaker();
+       localVideo.volume = 0;
+       localVideo.setSinkId(speakerId)
+       .then(function() {
+        console.log('setSinkID Success');
+       })
+       .catch(function(err) {
+        console.error('setSinkId Err:', err);
+       });
+      }
+     
+      function startFakeVideo() {
+       var constraints = {video: true, fake: true, audio: false};
+       navigator.mediaDevices.getUserMedia(
+        constraints
+       ).then(function(stream) {
+        localStream = stream;
+        logStream('selectedVideo', stream);
+        localVideo.srcObject = stream;
+       }).catch(function(err){
+        console.error('getUserMedia Err:', err);
+       });
+      }
+     
+      function startSelectedVideoAudio() {
+       var audioId = getSelectedAudio();
+       var deviceId = getSelectedVideo();
+       console.log('selected video device id=' + deviceId + ' ,  audio=' + audioId);
+       var constraints = {
+         audio: {
+          deviceId: audioId
+         },
+         video: { 
+          deviceId: deviceId
+         }
+       };
+       console.log('mediaDevice.getMedia() constraints:', constraints);
+     
+       navigator.mediaDevices.getUserMedia(
+        constraints
+       ).then(function(stream) {
+        localStream = stream;
+        logStream('selectedVideo', stream);
+        localVideo.srcObject = stream;
+       }).catch(function(err){
+        console.error('getUserMedia Err:', err);
+       });
+      }
+     
+      navigator.mediaDevices.ondevicechange = function (evt) {
+       console.log('mediaDevices.ondevicechange() evt:', evt);
+      };
+     </script>
+
+  </body>
+
+</html>

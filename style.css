@@ -1,0 +1,142 @@
+/* normalize */
+body { margin: 0; }
+
+/* global styles */
+video {
+  text-align: center;
+  background-color: #111;
+  width: 100%;
+  height: 100%;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 0;
+}
+
+.note {
+  text-align: center;
+}
+
+.meta {
+  text-align: center;
+  font-size: .8rem;
+  color: gray;
+}
+
+.container {
+  margin: auto;
+}
+
+.p {
+  color: white;
+}
+
+/* p2p-media styles */
+.p2p-media .box1 {
+  position: absolute;
+
+
+	width: 650px;
+	height: 600px;
+	background: #202124;
+}
+
+.p2p-media .box2 {
+  position: absolute;
+  text-align: center;
+  left: 110px;
+  top: 600px;
+	width: 400px;
+	height: 500px;
+	background: #202124;
+}
+
+.p2p-media {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.p2p-media .remote-stream {
+  width: 650px;
+  height: 600px;
+}
+
+.p2p-media .local-stream {
+  right: 10px;
+  left: 10px;
+  width: 100%;
+}
+
+
+/*Canvas Painter*/
+
+
+h1 {
+  font-size: 14pt;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+a {
+  text-decoration: none;
+  color: black;
+}
+canvas {
+  border: 1px solid #AAAAAA;
+}
+#canvas {
+  position: absolute;
+
+}
+#canvasInterface {
+  position: absolute;
+
+
+}
+#noCanvas {
+  position: absolute;
+
+  top: 100px;
+  width: 400px;
+  height: 400px;
+  font-size: 16px;
+}
+#chooserWidgets {
+  display: block;
+  position: absolute;
+  left: 90px;
+  width: 300px;
+  top: 450px;
+}
+#chooserWidgets canvas {
+  margin-bottom: 10px;
+}
+#controls {
+  position: absolute;
+  top: 620px;
+  left: 15px;
+  font-size: 12px;
+  width: 70px;
+}
+.ctr_btn {
+  overflow: hidden;
+  width: 70px;
+  height: 20px;
+  cursor: pointer;
+  padding-left: 3px;
+  margin-bottom: 2px;
+  border:1px solid #AAAAAA;
+  background:#FFFFFF;
+}
+#cpainterInfo {
+  position: absolute;
+  left: 500px;
+  top: 300px;
+  
+}
+#errorArea {
+  position: absolute;
+  width: 200px;
+  left: 800px;
+}
