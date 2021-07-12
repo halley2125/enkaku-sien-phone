@@ -1,5 +1,7 @@
 /* normalize */
-body { margin: 0; }
+body { margin: 0; 
+  background-color: #131313;
+}
 
 /* global styles */
 video {
